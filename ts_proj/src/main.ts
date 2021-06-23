@@ -1,7 +1,7 @@
 import "http://localhost:8080/polimi-tiw-2020-project/api/poliesami.js";
-import { App } from "./App.js";
-import { Page } from "./Page.js";
-import { REST_PARAM } from "./router/Route.js";
+import { App } from "./core/App.js";
+import { Page } from "./core/Page.js";
+import { REST_PARAM } from "./core/router/Route.js";
 
 declare global {
 	interface Window {
