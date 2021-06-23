@@ -43,6 +43,20 @@ class Page1 extends Page {
 	}
 }
 
+class Page2 extends Page {
+	title: string;
+
+	constructor(app: App, {title = "Default"} = {}) {
+		super(app);
+		this.title = title;
+	}
+
+	show({name = "Franco", surname = "Franchi", id = 0} = {}): void {
+		this.app.view.showUser(<User>{name: name, surname: surname, personCode: "00000000"});
+		this.app.view.showCareer(<Career>{role: "test", id: id});
+	}
+}
+
 class Filter0 extends Filter {
 	doFilter() {
 		this.app.route("/test/71");
@@ -65,6 +79,7 @@ function main() {
 	app.addPageRoute("/test/:id", Page0, {title: "Test"});
 	app.addPageRoute("/test/:id/rest/*", Page0, {title: "Rest"});
 	app.addPageRoute("/template/:text", Page1, {title: "Template"});
+	app.addPageRoute("/user/:name/:surname/:id", Page2, {title: "Template"});
 	app.addFilterRoute("/redirect/*", Filter1)
 	app.addFilterRoute("/forward", Filter0)
 
