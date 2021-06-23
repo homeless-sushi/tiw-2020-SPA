@@ -7,6 +7,10 @@ declare global {
 	interface Window {
 		app: App;
 	}
+
+	interface ParentNode {
+		replaceChildren(...nodes: (Node | string)[]): void;
+	}
 }
 
 class Page0 extends Page {
@@ -20,6 +24,22 @@ class Page0 extends Page {
 	show(params: any): void {
 		document.title = this.title;
 		console.log(params);
+	}
+}
+
+class Page1 extends Page {
+	title: string;
+
+	constructor(app: App, {title = "Default"} = {}) {
+		super(app);
+		this.title = title;
+	}
+
+	show({text = "default"} = {}): void {
+		this.app.templateEngine.process("test", {text: text})
+			.then(frag => {
+				document.getElementById("content")!.appendChild(frag);
+			});
 	}
 }
 
@@ -44,8 +64,13 @@ function main() {
 	app.setDefaultPage(Page0);
 	app.addPageRoute("/test/:id", Page0, {title: "Test"});
 	app.addPageRoute("/test/:id/rest/*", Page0, {title: "Rest"});
+	app.addPageRoute("/template/:text", Page1, {title: "Template"});
 	app.addFilterRoute("/redirect/*", Filter1)
 	app.addFilterRoute("/forward", Filter0)
+
+	app.templateEngine.addStringTemplate("test", "<section id=\"e\"></section>", (fragment, {text = "default"} = {}) => {
+		fragment.getElementById("e")!.textContent = text;
+	});
 
 	app.run();
 }
