@@ -2,11 +2,13 @@ import { Router } from "./router/Router.js";
 import { PageCtor } from "./Page.js";
 import { FilterCtor } from "./Filter.js";
 import { TemplateEngine } from "./template/TemplateEngine.js";
+import { View } from "./View.js";
 
 export class App {
 	private _model: PoliEsaMi.Model | null;
 	private _router: Router = new Router();
 	private _templateEngine: TemplateEngine = new TemplateEngine();
+	private _view: View = new View();
 
 	private _linkClickHandlerBinded = this._linkClickHandler.bind(this);
 	private _popStateHandlerBinded = this._popStateHandler.bind(this);
@@ -32,6 +34,10 @@ export class App {
 
 	get templateEngine() {
 		return this._templateEngine;
+	}
+
+	get view() {
+		return this._view;
 	}
 
 	run(): void {

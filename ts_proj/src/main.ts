@@ -38,7 +38,7 @@ class Page1 extends Page {
 	show({text = "default"} = {}): void {
 		this.app.templateEngine.process("test", {text: text})
 			.then(frag => {
-				document.getElementById("content")!.appendChild(frag);
+				this.app.view.content.appendChild(frag);
 			});
 	}
 }
