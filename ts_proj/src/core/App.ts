@@ -2,7 +2,7 @@ import { Router } from "./router/Router.js";
 
 export class App {
 	private _path: string;
-	private _model = new PoliEsaMi.Model();
+	private _model: PoliEsaMi.Model | null;
 	private _router: Router = new Router();
 
 	private _linkClickHandlerBinded = this._linkClickHandler.bind(this);
@@ -10,6 +10,12 @@ export class App {
 
 	constructor(path: string) {
 		this._path = path;
+		try {
+			this._model = new PoliEsaMi.Model();
+		} catch(e) {
+			console.error("Remote interface not present");
+			this._model = null;
+		}
 		this.router.pathPrefix = this._path;
 	}
 
@@ -18,6 +24,8 @@ export class App {
 	}
 
 	get model() {
+		if(this._model == null)
+			throw new Error("Remote interface not present");
 		return this._model;
 	}
 

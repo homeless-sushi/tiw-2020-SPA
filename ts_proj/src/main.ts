@@ -1,4 +1,3 @@
-import "http://localhost:8080/polimi-tiw-2020-project/api/poliesami.js";
 import { App } from "./core/App.js";
 import { Page } from "./core/Page.js";
 import { REST_PARAM } from "./core/router/Route.js";
