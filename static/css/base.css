@@ -1,0 +1,135 @@
+/* FONTS */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+/* HEADER */
+
+body {
+	font-family: 'Roboto', sans-serif;
+	margin: 0;
+}
+
+header {
+	padding: 10px;
+	overflow: hidden;
+}
+
+header > div {
+	color: #fafafa;
+	background: #728FA5;
+	border-radius: 1em;
+	padding: 1em 2em;
+}
+
+header h1 {
+	text-align: center;
+	margin: 1.5em 0;
+}
+
+header a {
+	display: inline-block;
+	font-weight: 500;
+}
+
+header a:link, header a:visited {
+	color: inherit;
+	text-decoration: none;
+}
+
+header a:hover, header a:active {
+	text-decoration: underline;
+}
+
+#menu {
+	display: flex;
+	justify-content: space-between;
+	font-weight: 300;
+	align-items: flex-end;
+}
+
+#back {
+	margin-right: 1.5em;
+}
+
+#identity {
+	display: flex;
+	flex-direction: column;
+	text-align: right;
+	align-items: flex-end;
+	flex: 1;
+}
+
+#identity a {
+	padding-left: 1.5em;
+}
+
+#identity > div:not(:first-child) {
+	margin-top: .5em;
+}
+
+/* COMMON */
+
+#content {
+	padding: 0 10px;
+	overflow: auto;
+}
+
+section {
+	margin: 40px auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	overflow: auto;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+a:link, a:visited {
+	color: inherit;
+}
+
+.wide {
+	width: 100%;
+	max-width: 800px;
+}
+
+.boxed {
+	padding: 0 1em;
+	border: 1px solid #CCC;
+	border-radius: 1em;
+}
+
+.link-button {
+	background: none;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	letter-spacing: inherit;
+}
+
+.error {
+	font-size: 0.8em;
+	font-style: italic;
+	color: red;
+}
+
+.symbol {
+	font-family: emoji;
+	font-size: 2em;
+}
+
+a.symbol {
+	text-decoration: none;
+}
+
+.row {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.row > * {
+	margin: 0 40px;
+}

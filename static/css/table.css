@@ -1,0 +1,40 @@
+/* TABLE */
+
+table.list {
+	border: 2px solid rgb(200, 200, 200);
+	letter-spacing: 1px;
+	font-size: 0.8em;
+	text-align: center;
+	margin: 0 auto;
+}
+
+table.list td, th {
+	border: 1px solid rgb(190, 190, 190);
+	padding: 10px 5px;
+}
+
+table.list thead th {
+	background-color: rgb(220, 220, 220);
+}
+
+table.list tr:nth-child(even) td,
+table.list .even {
+	background-color: rgb(235, 235, 235);
+}
+
+table.list tr:nth-child(odd) td,
+table.list .odd {
+	background-color: rgb(245, 245, 245);
+}
+
+table.list tr:hover td:not(th:hover ~ *) {
+	background-color: rgb(225, 225, 225);
+}
+
+table.fixed {
+	table-layout: fixed;
+}
+
+table.fixed td, table.fixed th {
+	overflow: hidden;
+}

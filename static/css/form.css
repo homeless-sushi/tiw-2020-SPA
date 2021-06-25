@@ -1,0 +1,58 @@
+/* FORM */
+
+form input {
+	font: inherit;
+}
+
+form > div {
+	margin: 18px 0;
+}
+
+form input[type=text],
+form input[type=password],
+form input[type=number],
+form textarea {
+	box-sizing: border-box;
+	border: 1px solid #999;
+}
+
+form input[type=text]:focus,
+form input[type=password]:focus,
+form input[type=number]:focus,
+form textarea:focus {
+	border-color: #101010;
+}
+
+.field input[type=checkbox] {
+	margin: 0;
+}
+
+.field {
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+}
+
+.field label {
+	width: 150px;
+	padding-right: 1em;
+	text-align: end;
+}
+
+.field .expand {
+	flex: 1;
+}
+
+.field input[type=number] {
+	text-align: end;
+	width: 4em;
+}
+
+.field input[type=submit] {
+	padding: .4em .8em;
+}
+
+.big-button {
+	text-transform: uppercase;
+	flex: 0 1 200px;
+}
