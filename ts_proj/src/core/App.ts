@@ -1,4 +1,6 @@
 import { Router } from "./router/Router.js";
+import { Page } from "./Page.js";
+import { Filter } from "./Filter.js";
 
 export class App {
 	private _model: PoliEsaMi.Model | null;
@@ -32,14 +34,28 @@ export class App {
 		history.replaceState(...this._route(location.pathname));
 	}
 
+	setDefaultPage(pageType: new(app: App) => Page, title?: string) {
+		const page = new pageType(this);
+		this.router.setDefaultPage(page, title);
+	}
+
+	addPageRoute(pattern: string, pageType: new(app: App) => Page, title?: string) {
+		const page = new pageType(this);
+		this.router.addPageRoute(pattern, page, title);
+	}
+
+	addFilterRoute(pattern: string, filterType: new(app: App) => Filter) {
+		const filter = new filterType(this);
+		this.router.addFilterRoute(pattern, filter);
+	}
+
 	navigateTo(path: string): void {
 		history.pushState(...this._route(path));
 	}
 
 	_route(path: string): [any, string, string | null | undefined] {
-		const {page, title, url} = this.router.route(path);
+		const {title, url} = this.router.route(path);
 		document.title = title;
-		page.show(this);
 		return [null, title, url];
 	}
 

@@ -1,7 +1,11 @@
 import { App } from "./App.js";
 
-export type pageCtor =  new(params?: {[k: string]: string}) => Page;
+export abstract class Page {
+	app: App;
 
-export interface Page {
-	show(app: App): void;
+	constructor(app: App) {
+		this.app = app;
+	}
+
+	abstract show(params?: {[k: string]: string}): void;
 }

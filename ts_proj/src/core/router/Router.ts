@@ -1,10 +1,11 @@
-import { Page, pageCtor } from "../Page.js";
+import { Filter, FilterResult } from "../Filter.js";
+import { Page } from "../Page.js";
 import { Route } from "./Route.js";
 
 export class Router {
 	private _filterRoutes: FilterRoute[] = [];
 	private _pageRoutes: PageRoute[] = [];
-	private _defaultPage?: pageCtor;
+	private _defaultPage?: Page;
 	private _defaultTitle?: string;
 
 	route(pathname: string): HistoryStackElem {
@@ -12,7 +13,7 @@ export class Router {
 			const match = filterRoute.route.match(pathname);
 			if(match == null)
 				continue;
-			const result: FilterResult = filterRoute.filter(match.groups);
+			const result: FilterResult = filterRoute.filter.doFilter(match.groups);
 			if(!result.accept) {
 				if(result.location == null)
 					return this._getDefaultRoute(pathname);
@@ -25,23 +26,24 @@ export class Router {
 
 		for(const pageRoute of this._pageRoutes) {
 			const match = pageRoute.route.match(pathname);
-			if(match != null)
+			if(match != null) {
+				pageRoute.page.show(match.groups);
 				return {
-					page: new pageRoute.page(match.groups),
 					title: pageRoute.title || "",
 					url: pathname
 				};
+			}
 		}
 
 		return this._getDefaultRoute(pathname);
 	}
 
-	setDefaultPage(page: pageCtor, title?: string): void {
+	setDefaultPage(page: Page, title?: string): void {
 		this._defaultPage = page;
 		this._defaultTitle = title;
 	}
 
-	addPageRoute(path: string, page: pageCtor, title?: string): void {
+	addPageRoute(path: string, page: Page, title?: string): void {
 		this._pageRoutes.push({
 			route: new Route(path),
 			page: page,
@@ -49,7 +51,7 @@ export class Router {
 		});
 	}
 
-	addFilterRoute(path: string, filter: filterFn): void {
+	addFilterRoute(path: string, filter: Filter): void {
 		this._filterRoutes.push({
 			route: new Route(path),
 			filter: filter
@@ -60,35 +62,26 @@ export class Router {
 		if(this._defaultPage == null)
 			throw new Error("No route found");
 
+		this._defaultPage.show();
 		return {
-			page: new this._defaultPage(),
 			title: this._defaultTitle || "",
 			url: pathname
 		};
 	}
 }
 
-export type filterFn = (params?: {[k: string]: string}) => FilterResult;
-
 export interface FilterRoute {
 	route: Route,
-	filter: filterFn
-}
-
-export interface FilterResult {
-	accept: boolean;
-	redirect?: boolean;
-	location?: string;
+	filter: Filter
 }
 
 export interface PageRoute {
 	route: Route,
-	page: pageCtor,
+	page: Page,
 	title?: string
 }
 
 export interface HistoryStackElem {
-	page: Page;
 	title: string;
 	url?: string | null;
 }
