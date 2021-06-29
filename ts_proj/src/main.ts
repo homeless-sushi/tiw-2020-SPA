@@ -10,20 +10,30 @@ declare global {
 }
 
 class Page0 extends Page {
+	title: string;
+
+	constructor(app: App, {title = "Default"} = {}) {
+		super(app);
+		this.title = title;
+	}
+
 	show(params: any): void {
+		document.title = this.title;
 		console.log(params);
 	}
 }
 
 class Filter0 extends Filter {
 	doFilter() {
-		return {accept: false, redirect: false, location: "/test/71"};
+		this.app.route("/test/71");
+		return false;
 	}
 }
 
 class Filter1 extends Filter {
 	doFilter(params: {[k: string]: string} = {}) {
-		return { accept: false, redirect: true, location: params[REST_PARAM] ?? "/"};
+		this.app.redirectTo(params[REST_PARAM] ?? "/");
+		return false;
 	}
 }
 
@@ -31,9 +41,9 @@ function main() {
 	const app = new App();
 	window.app = app;
 
-	app.setDefaultPage(Page0, "Default");
-	app.addPageRoute("/test/:id", Page0, "Test");
-	app.addPageRoute("/test/:id/rest/*", Page0, "Rest");
+	app.setDefaultPage(Page0);
+	app.addPageRoute("/test/:id", Page0, {title: "Test"});
+	app.addPageRoute("/test/:id/rest/*", Page0, {title: "Rest"});
 	app.addFilterRoute("/redirect/*", Filter1)
 	app.addFilterRoute("/forward", Filter0)
 

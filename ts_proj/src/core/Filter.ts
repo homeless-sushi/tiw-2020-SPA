@@ -1,10 +1,6 @@
 import { App } from "./App.js";
 
-export interface FilterResult {
-	accept: boolean;
-	redirect?: boolean;
-	location?: string;
-}
+export type FilterCtor = new(app: App, args?: {[k: string]: any}) => Filter;
 
 export abstract class Filter {
 	app: App;
@@ -13,5 +9,5 @@ export abstract class Filter {
 		this.app = app;
 	}
 
-	abstract doFilter(params?: {[k: string]: string}): FilterResult;
+	abstract doFilter(params?: {[k: string]: string}): boolean;
 }

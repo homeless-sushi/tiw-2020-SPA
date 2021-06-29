@@ -1,6 +1,6 @@
 import { Router } from "./router/Router.js";
-import { Page } from "./Page.js";
-import { Filter } from "./Filter.js";
+import { PageCtor } from "./Page.js";
+import { FilterCtor } from "./Filter.js";
 
 export class App {
 	private _model: PoliEsaMi.Model | null;
@@ -31,32 +31,36 @@ export class App {
 	run(): void {
 		document.body.addEventListener("click", this._linkClickHandlerBinded);
 		window.addEventListener("popstate", this._popStateHandlerBinded);
-		history.replaceState(...this._route(location.pathname));
+		this.route();
 	}
 
-	setDefaultPage(pageType: new(app: App) => Page, title?: string) {
-		const page = new pageType(this);
-		this.router.setDefaultPage(page, title);
+	setDefaultPage(pageType: PageCtor, args?: {[k: string]: any}): void {
+		const page = new pageType(this, args);
+		this.router.defaultPage = page;
 	}
 
-	addPageRoute(pattern: string, pageType: new(app: App) => Page, title?: string) {
-		const page = new pageType(this);
-		this.router.addPageRoute(pattern, page, title);
+	addPageRoute(pattern: string, pageType: PageCtor, args?: {[k: string]: any}): void {
+		const page = new pageType(this, args);
+		this.router.addPageRoute(pattern, page);
 	}
 
-	addFilterRoute(pattern: string, filterType: new(app: App) => Filter) {
-		const filter = new filterType(this);
+	addFilterRoute(pattern: string, filterType: FilterCtor, args?: {[k: string]: any}): void {
+		const filter = new filterType(this, args);
 		this.router.addFilterRoute(pattern, filter);
 	}
 
-	navigateTo(path: string): void {
-		history.pushState(...this._route(path));
+	navigateTo(url: string): void {
+		history.pushState(null, "", url);
+		this.route();
 	}
 
-	_route(path: string): [any, string, string | null | undefined] {
-		const {title, url} = this.router.route(path);
-		document.title = title;
-		return [null, title, url];
+	redirectTo(url: string): void {
+		history.replaceState(null, "", url);
+		this.route();
+	}
+
+	route(url: string = location.pathname): void {
+		this.router.route(url);
 	}
 
 	_linkClickHandler(e: MouseEvent): void {
@@ -68,6 +72,6 @@ export class App {
 	}
 
 	_popStateHandler(e: PopStateEvent): void {
-		this._route(location.pathname);
+		this.route();
 	}
 }
