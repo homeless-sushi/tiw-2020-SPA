@@ -6,7 +6,6 @@ export class Router {
 	private _pageRoutes: PageRoute[] = [];
 	private _defaultPage?: pageCtor;
 	private _defaultTitle?: string;
-	pathPrefix: string = "";
 
 	route(pathname: string): HistoryStackElem {
 		for(const filterRoute of this._filterRoutes) {
@@ -17,8 +16,6 @@ export class Router {
 			if(!result.accept) {
 				if(result.location == null)
 					return this._getDefaultRoute(pathname);
-				if(result.location.startsWith("/"))
-					result.location = this.pathPrefix + result.location;
 				const reroute = this.route(result.location);
 				if(!result.redirect)
 					reroute.url = pathname;
@@ -46,7 +43,7 @@ export class Router {
 
 	addPageRoute(path: string, page: pageCtor, title?: string): void {
 		this._pageRoutes.push({
-			route: new Route(this.pathPrefix + path),
+			route: new Route(path),
 			page: page,
 			title: title
 		});
@@ -54,7 +51,7 @@ export class Router {
 
 	addFilterRoute(path: string, filter: filterFn): void {
 		this._filterRoutes.push({
-			route: new Route(this.pathPrefix + path),
+			route: new Route(path),
 			filter: filter
 		});
 	}

@@ -21,7 +21,7 @@ class Page0 implements Page {
 }
 
 function main() {
-	const app = new App("/tiw-2020-SPA");
+	const app = new App();
 	window.app = app;
 
 	app.router.setDefaultPage(Page0, "Default");

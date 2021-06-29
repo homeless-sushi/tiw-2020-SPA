@@ -1,26 +1,19 @@
 import { Router } from "./router/Router.js";
 
 export class App {
-	private _path: string;
 	private _model: PoliEsaMi.Model | null;
 	private _router: Router = new Router();
 
 	private _linkClickHandlerBinded = this._linkClickHandler.bind(this);
 	private _popStateHandlerBinded = this._popStateHandler.bind(this);
 
-	constructor(path: string) {
-		this._path = path;
+	constructor() {
 		try {
 			this._model = new PoliEsaMi.Model();
 		} catch(e) {
 			console.error("Remote interface not present");
 			this._model = null;
 		}
-		this.router.pathPrefix = this._path;
-	}
-
-	get path() {
-		return this._path;
 	}
 
 	get model() {
