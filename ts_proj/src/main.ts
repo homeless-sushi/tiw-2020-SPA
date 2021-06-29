@@ -31,21 +31,6 @@ function main() {
 	app.router.addFilterRoute("/forward", () => ({ accept: false, redirect: false, location: "/test/71"}))
 
 	app.run();
-
-	app.model.test()
-		.then(r => display("base", r));
-	app.model.testInside()
-		.then(r => display("not logged in", r));
-	app.model.login("00000001", "SciamanoGiurassico39")
-		.then(id => { display("id", id); return app.model.testInside(); })
-		.then(r => display("logged in", r));
-}
-
-function display(m: string, r: APIResponse<any>) {
-	if(r.error != null)
-		console.log(m, r.error);
-	else
-		console.log(m, r.data);
 }
 
 window.addEventListener("DOMContentLoaded", main);
