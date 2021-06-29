@@ -2,13 +2,14 @@ import { Template, StringTemplate, URLTemplate, templateParams, templateResolver
 
 export class TemplateEngine {
 	private _templates: Map<string, Template> = new Map();
+	pathPrefix: string = "";
 
 	addTemplate(name: string, template: Template): void {
 		this._templates.set(name, template);
 	}
 
 	addURLTemplate(name: string, url: string, resolver: templateResolver): void {
-		this.addTemplate(name, new URLTemplate(url, resolver));
+		this.addTemplate(name, new URLTemplate(this.pathPrefix + url, resolver));
 	}
 
 	addStringTemplate(name: string, html: string, resolver: templateResolver): void {
