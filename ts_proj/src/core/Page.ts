@@ -11,3 +11,16 @@ export abstract class Page {
 
 	abstract show(params?: {[k: string]: string}): void;
 }
+
+export class TitlePage extends Page {
+	title: string;
+
+	constructor(app: App, {title = ""} = {}) {
+		super(app);
+		this.title = title;
+	}
+
+	show() {
+		document.title = this.title;
+	}
+}

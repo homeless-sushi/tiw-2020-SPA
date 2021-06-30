@@ -16,6 +16,9 @@ export class App {
 	constructor() {
 		try {
 			this._model = new PoliEsaMi.Model();
+			const identity = this.identity;
+			if(identity != null)
+				this.view.showUser(identity.user);
 		} catch(e) {
 			console.error("Remote interface not present");
 			this._model = null;
@@ -73,6 +76,35 @@ export class App {
 
 	route(url: string = location.pathname): void {
 		this.router.route(url);
+	}
+
+	get identity() {
+		try {
+			return this.model.identity;
+		} catch(e) {
+			console.error(e);
+			return null;
+		}
+	}
+
+	async login(user: string, password: string, keep: boolean = false): Promise<APIResponse<Identity>> {
+		try {
+			const res = await this.model.login(user, password, keep);
+			if(res.data != null)
+				this.view.showUser(res.data.user);
+			return res;
+		} catch(e) {
+			return {error: e};
+		}
+	}
+
+	logout(): void {
+		try {
+			this.model.logout();
+		} catch(e) {
+			console.error(e);
+		}
+		this.view.clearUser();
 	}
 
 	_linkClickHandler(e: MouseEvent): void {
