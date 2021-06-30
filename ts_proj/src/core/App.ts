@@ -49,17 +49,17 @@ export class App {
 		this.route();
 	}
 
-	setDefaultPage(pageType: PageCtor, args?: {[k: string]: any}): void {
+	setDefaultPage(pageType: PageCtor, args?: any): void {
 		const page = new pageType(this, args);
 		this.router.defaultPage = page;
 	}
 
-	addPageRoute(pattern: string, pageType: PageCtor, args?: {[k: string]: any}): void {
+	addPageRoute(pattern: string, pageType: PageCtor, args?: any): void {
 		const page = new pageType(this, args);
 		this.router.addPageRoute(pattern, page);
 	}
 
-	addFilterRoute(pattern: string, filterType: FilterCtor, args?: {[k: string]: any}): void {
+	addFilterRoute(pattern: string, filterType: FilterCtor, args?: any): void {
 		const filter = new filterType(this, args);
 		this.router.addFilterRoute(pattern, filter);
 	}

@@ -1,4 +1,4 @@
-import { Template, StringTemplate, URLTemplate, templateParams, templateResolver } from "./Template.js";
+import { Template, StringTemplate, URLTemplate } from "./Template.js";
 
 export class TemplateEngine {
 	private _templates: Map<string, Template> = new Map();
@@ -8,22 +8,22 @@ export class TemplateEngine {
 		this._templates.set(name, template);
 	}
 
-	addURLTemplate(name: string, url: string, resolver: templateResolver): void {
-		this.addTemplate(name, new URLTemplate(this.pathPrefix + url, resolver));
+	addURLTemplate(name: string, url: string): void {
+		this.addTemplate(name, new URLTemplate(this.pathPrefix + url));
 	}
 
-	addStringTemplate(name: string, html: string, resolver: templateResolver): void {
-		this.addTemplate(name, new StringTemplate(html, resolver));
+	addStringTemplate(name: string, html: string): void {
+		this.addTemplate(name, new StringTemplate(html));
 	}
 
 	removeTemplate(name: string): void {
 		this._templates.delete(name);
 	}
 
-	async process(templateName: string, params?: templateParams): Promise<DocumentFragment> {
+	async get(templateName: string): Promise<DocumentFragment> {
 		const template = this._templates.get(templateName);
 		if(template == null)
 			throw new Error(`Template name ${templateName} not defined`);
-		return template.resolve(params);
+		return template.clone();
 	}
 }

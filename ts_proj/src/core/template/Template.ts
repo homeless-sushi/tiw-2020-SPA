@@ -1,15 +1,7 @@
 export abstract class Template {
-	private _resolver: templateResolver;
-
-	constructor(resolver: templateResolver = () => { /* NOOP */}) {
-		this._resolver = resolver;
-	}
-
-	async resolve(params?: templateParams): Promise<DocumentFragment> {
+	async clone(): Promise<DocumentFragment> {
 		const content = await this._getContent();
-		const cloned = document.importNode(content, true);
-		this._resolver(cloned, params);
-		return cloned;
+		return document.importNode(content, true);
 	}
 
 	abstract _getContent(): Promise<DocumentFragment>;
@@ -19,8 +11,8 @@ export class URLTemplate extends Template {
 	private _url: string;
 	private _element: HTMLTemplateElement | null = null;
 
-	constructor(url: string, resolver?: templateResolver) {
-		super(resolver);
+	constructor(url: string) {
+		super();
 		this._url = url;
 	}
 
@@ -41,8 +33,8 @@ export class URLTemplate extends Template {
 export class StringTemplate extends Template {
 	private _element: HTMLTemplateElement;
 
-	constructor(html: string, resolver?: templateResolver) {
-		super(resolver);
+	constructor(html: string) {
+		super();
 		this._element = document.createElement("template");
 		this._element.innerHTML = html;
 	}
@@ -51,6 +43,3 @@ export class StringTemplate extends Template {
 		return this._element.content;
 	}
 }
-
-export type templateParams = {[k: string]: any};
-export type templateResolver = (fragment: DocumentFragment, params?: templateParams) => void;

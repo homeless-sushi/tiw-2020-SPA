@@ -1,6 +1,6 @@
 import { App } from "./App.js";
 
-export type FilterCtor = new(app: App, args?: {[k: string]: any}) => Filter;
+export type FilterCtor = new(app: App, args: any) => Filter;
 
 export abstract class Filter {
 	app: App;

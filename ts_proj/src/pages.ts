@@ -16,7 +16,7 @@ export class DefaultPage extends TitlePage {
 export class LoginPage extends TitlePage {
 	show() {
 		super.show();
-		this.app.templateEngine.process("login")
+		this.app.templateEngine.get("login")
 			.then(frag => {
 				const form = <HTMLFormElement>frag.getElementById("loginForm");
 				form.addEventListener("submit", (e) => {
