@@ -35,7 +35,7 @@ export class View {
 	}
 
 	showCareer(career: Career) {
-		this._careerText.data = `${career.role}, `;
+		this._careerText.data = `${career.role[0].toUpperCase() + career.role.slice(1)}, `;
 		if(career.major != null)
 			this._careerText.appendData(`${career.major}, `);
 		this._careerText.appendData(`${career.id}`);

@@ -15,7 +15,7 @@ export abstract class Page {
 export class TitlePage extends Page {
 	title: string;
 
-	constructor(app: App, {title = ""} = {}) {
+	constructor(app: App, {title}: {title: string}) {
 		super(app);
 		this.title = title;
 	}
