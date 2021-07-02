@@ -1,4 +1,4 @@
-import { Page, TitlePage } from "./core/Page.js";
+import { RedirectPage, TitlePage } from "./core/Page.js";
 
 declare global {
 	interface ParentNode {
@@ -41,10 +41,10 @@ export class LoginPage extends TitlePage {
 	}
 }
 
-export class LogoutPage extends Page {
+export class LogoutPage extends RedirectPage {
 	show() {
 		this.app.logout();
-		this.app.redirectTo("/login");
+		super.show();
 	}
 }
 

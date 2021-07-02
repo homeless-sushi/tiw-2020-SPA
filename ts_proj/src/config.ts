@@ -1,13 +1,16 @@
 import { FilterCtor } from "./core/Filter.js";
-import { PageCtor } from "./core/Page.js";
+import { PageCtor, RedirectPage } from "./core/Page.js";
 import { CareerFilter, InsideFilter } from "./filters.js";
 import { CareersPage, DefaultPage, LoginPage, LogoutPage } from "./pages.js";
 
 export const defaultPage: [PageCtor, any?] = [DefaultPage, {title: "Not Found"}];
 
 export const pages: [string, PageCtor, any?][] = [
+	["/", RedirectPage, {location: "inside/"}],
 	["/login", LoginPage, {title: "Login"}],
-	["/logout", LogoutPage],
+	["/logout", LogoutPage, {location: "login"}],
+	["/inside", RedirectPage, {location: "inside/"}],
+	["/inside/", RedirectPage, {location: "careers"}],
 	["/inside/careers", CareersPage, {title: "Careers"}],
 ];
 
