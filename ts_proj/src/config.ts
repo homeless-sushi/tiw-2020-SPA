@@ -1,7 +1,7 @@
 import { FilterCtor } from "./core/Filter.js";
 import { PageCtor, RedirectPage } from "./core/Page.js";
 import { CareerFilter, InsideFilter } from "./filters.js";
-import { CareersPage, DefaultPage, LoginPage, LogoutPage } from "./pages.js";
+import { CareersPage, DefaultPage, LoginPage, LogoutPage, StudentExamsPage } from "./pages.js";
 
 export const defaultPage: [PageCtor, any?] = [DefaultPage, {title: "Not Found"}];
 
@@ -12,6 +12,10 @@ export const pages: [string, PageCtor, any?][] = [
 	["/inside", RedirectPage, {location: "inside/"}],
 	["/inside/", RedirectPage, {location: "careers"}],
 	["/inside/careers", CareersPage, {title: "Careers"}],
+	["/inside/student/:id", RedirectPage, {location: ({id}: {id: string}) => `${id}/`}],
+	["/inside/student/:id/", RedirectPage, {location: "exams/"}],
+	["/inside/student/:id/exams", RedirectPage, {location: "exams/"}],
+	["/inside/student/:id/exams/", StudentExamsPage, {title: "Exams"}],
 ];
 
 export const filters: [string, FilterCtor, {[k: string]: string}?][] = [
@@ -25,4 +29,5 @@ export const templatesPath = "/static/templates/";
 export const templates: [string, string][] = [
 	["login", "login.html"],
 	["careers", "careers.html"],
+	["exams", "exams.html"],
 ];

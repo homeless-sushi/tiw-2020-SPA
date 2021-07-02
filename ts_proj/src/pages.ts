@@ -79,3 +79,49 @@ export class CareersPage extends TitlePage {
 		}
 	}
 }
+
+export class StudentExamsPage extends TitlePage {
+	show({id}: {id: string}) {
+		super.show();
+		Promise.all([
+			this.app.templateEngine.get("exams"),
+			this.app.model.getStudCoursesExams(+id)
+		]).then(([frag, res]) => {
+			if(res.error) {
+				console.error(res.error);
+				this.app.redirectTo("/inside/careers");
+				return;
+			}
+			this._fill(frag, res.data!);
+			this.app.view.content.replaceChildren(frag);
+		});
+	}
+
+	_fill(frag: DocumentFragment, courses: CourseExams[]) {
+		const tbody = <HTMLTableElement>frag.getElementById("exams_tbody");
+		for(const [i, course] of courses.entries()) {
+			for(const [j, exam] of course.exams.entries()) {
+				const tr = tbody.insertRow();
+				if(!j) {
+					const courseId_th = document.createElement("th");
+					const courseName_th = document.createElement("th");
+					tr.append(courseId_th, courseName_th);
+					courseId_th.innerText = course.id as unknown as string;
+					courseName_th.innerText = course.name;
+					courseId_th.className = courseName_th.className = i % 2 ? "odd" : "even";
+					courseId_th.rowSpan = courseName_th.rowSpan = course.exams.length;
+				}
+				const id_td = tr.insertCell();
+				id_td.innerText = exam.id as unknown as string;
+				const date_td = tr.insertCell();
+				date_td.innerText = exam.date;
+				const link_td = tr.insertCell();
+				const link_a = document.createElement("a");
+				link_a.className = "symbol data-link";
+				link_a.href = `exam/${exam.id}`;
+				link_a.innerText = "➡";
+				link_td.appendChild(link_a);
+			}
+		}
+	}
+}
