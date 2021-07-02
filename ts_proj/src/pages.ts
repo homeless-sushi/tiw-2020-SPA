@@ -48,13 +48,6 @@ export class LogoutPage extends Page {
 	}
 }
 
-export class InsidePage extends TitlePage {
-	show() {
-		super.show();
-		this.app.view.content.innerHTML = "<section>INSIDE</section>";
-	}
-}
-
 export class CareersPage extends TitlePage {
 	show() {
 		super.show();
