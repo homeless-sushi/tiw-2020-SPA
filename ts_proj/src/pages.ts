@@ -80,12 +80,12 @@ export class CareersPage extends TitlePage {
 	}
 }
 
-export class StudentExamsPage extends TitlePage {
+export abstract class ExamsPage extends TitlePage {
 	show({id, year}: {id: string, year: string}) {
 		super.show();
 		Promise.all([
 			this.app.templateEngine.get("exams"),
-			this.app.model.getStudCoursesExams(+id, +year)
+			this._getExams(+id, +year)
 		]).then(([frag, res]) => {
 			if(res.error) {
 				console.error(res.error);
@@ -134,5 +134,20 @@ export class StudentExamsPage extends TitlePage {
 			e.preventDefault();
 			this.app.navigateTo(input.value);
 		});
+	}
+
+	abstract _getExams(id: number, year: number): Promise<APIResponse<CourseExams[]>>;
+}
+
+export class StudentExamsPage extends ExamsPage {
+	async _getExams(id: number, year: number): Promise<APIResponse<CourseExams[]>> {
+		return this.app.model.getStudCoursesExams(id, year);
+	}
+}
+
+
+export class ProfessorExamsPage extends ExamsPage {
+	async _getExams(id: number, year: number): Promise<APIResponse<CourseExams[]>> {
+		return this.app.model.getProfCoursesExams(id, year);
 	}
 }

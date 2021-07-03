@@ -2,7 +2,7 @@ import { FilterCtor } from "./core/Filter.js";
 import { PageCtor, RedirectPage } from "./core/Page.js";
 import { getAcademicYear } from "./core/utils.js";
 import { CareerFilter, InsideFilter } from "./filters.js";
-import { CareersPage, DefaultPage, LoginPage, LogoutPage, StudentExamsPage } from "./pages.js";
+import { CareersPage, DefaultPage, LoginPage, LogoutPage, ProfessorExamsPage, StudentExamsPage } from "./pages.js";
 
 export const defaultPage: [PageCtor, any?] = [DefaultPage, {title: "Not Found"}];
 
@@ -18,6 +18,11 @@ export const pages: [string, PageCtor, any?][] = [
 	["/inside/student/:id/exams", RedirectPage, {location: "exams/"}],
 	["/inside/student/:id/exams/", RedirectPage, {location: () => `${getAcademicYear(new Date())}`}],
 	["/inside/student/:id/exams/:year", StudentExamsPage, {title: "Exams"}],
+	["/inside/professor/:id", RedirectPage, {location: ({id}: {id: string}) => `${id}/`}],
+	["/inside/professor/:id/", RedirectPage, {location: "exams/"}],
+	["/inside/professor/:id/exams", RedirectPage, {location: "exams/"}],
+	["/inside/professor/:id/exams/", RedirectPage, {location: () => `${getAcademicYear(new Date())}`}],
+	["/inside/professor/:id/exams/:year", ProfessorExamsPage, {title: "Exams"}],
 ];
 
 export const filters: [string, FilterCtor, {[k: string]: string}?][] = [
