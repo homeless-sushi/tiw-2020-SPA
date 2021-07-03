@@ -16,6 +16,8 @@ export class DefaultPage extends TitlePage {
 export class LoginPage extends TitlePage {
 	show() {
 		super.show();
+		this.app.view.clearCareer();
+		this.app.view.clearBackLink();
 		this.app.templateEngine.get("login")
 			.then(frag => {
 				const form = <HTMLFormElement>frag.getElementById("loginForm");
@@ -51,6 +53,8 @@ export class LogoutPage extends RedirectPage {
 export class CareersPage extends TitlePage {
 	show() {
 		super.show();
+		this.app.view.clearCareer();
+		this.app.view.clearBackLink();
 		this.app.templateEngine.get("careers")
 			.then(frag => {
 				this._fill(frag);
@@ -83,6 +87,7 @@ export class CareersPage extends TitlePage {
 export abstract class ExamsPage extends TitlePage {
 	show({id, year}: {id: string, year: string}) {
 		super.show();
+		this.app.view.clearBackLink();
 		Promise.all([
 			this.app.templateEngine.get("exams"),
 			this._getExams(+id, +year)
@@ -168,6 +173,7 @@ export class StudentExamRegistrationPage extends TitlePage {
 			const exam = res.data!;
 			this._fillExam(frag, exam);
 			this.app.view.content.replaceChildren(frag);
+			this.app.view.showBackLink("Exams", `../${exam.year}`);
 		});
 	}
 

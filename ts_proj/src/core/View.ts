@@ -3,6 +3,8 @@ export class View {
 	private _identityElement: HTMLElement;
 	private _userElement: HTMLElement;
 	private _careerElement: HTMLElement;
+	private _backElement: HTMLElement;
+	private _backLinkElement: HTMLAnchorElement;
 	private _userText: Text = document.createTextNode("");
 	private _careerText: Text = document.createTextNode("");
 
@@ -10,17 +12,34 @@ export class View {
 		contentID = "content",
 		identityID = "identity",
 		userID = "user_data",
-		careerID = "career_data"
+		careerID = "career_data",
+		backID = "back",
+		backLinkID = "back_link",
 	} = {}) {
 		this._contentElement = getElementByIdOrError(document, contentID);
 		this._identityElement = getElementByIdOrError(document, identityID);
 		this._userElement = getElementByIdOrError(document, userID);
 		this._careerElement = getElementByIdOrError(document, careerID);
+		this._backElement = getElementByIdOrError(document, backID);
+		this._backLinkElement = <HTMLAnchorElement>getElementByIdOrError(document, backLinkID);
 
 		this._userElement.prepend(this._userText);
 		this._careerElement.prepend(this._careerText);
 		this.clearUser();
 		this.clearCareer();
+		this.clearBackLink();
+	}
+
+	showBackLink(text: string, href: string) {
+		this._backLinkElement.innerText = text;
+		this._backLinkElement.href = href;
+		this._backElement.style.display = "";
+	}
+
+	clearBackLink() {
+		this._backLinkElement.innerText = "";
+		this._backLinkElement.href = "";
+		this._backElement.style.display = "none";
 	}
 
 	showUser(user: User) {
