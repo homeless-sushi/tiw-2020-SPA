@@ -81,23 +81,24 @@ export class CareersPage extends TitlePage {
 }
 
 export class StudentExamsPage extends TitlePage {
-	show({id}: {id: string}) {
+	show({id, year}: {id: string, year: string}) {
 		super.show();
 		Promise.all([
 			this.app.templateEngine.get("exams"),
-			this.app.model.getStudCoursesExams(+id)
+			this.app.model.getStudCoursesExams(+id, +year)
 		]).then(([frag, res]) => {
 			if(res.error) {
 				console.error(res.error);
 				this.app.redirectTo("/inside/careers");
 				return;
 			}
-			this._fill(frag, res.data!);
+			this._fillTable(frag, res.data!);
+			this._fillForm(frag, year);
 			this.app.view.content.replaceChildren(frag);
 		});
 	}
 
-	_fill(frag: DocumentFragment, courses: CourseExams[]) {
+	_fillTable(frag: DocumentFragment, courses: CourseExams[]) {
 		const tbody = <HTMLTableElement>frag.getElementById("exams_tbody");
 		for(const [i, course] of courses.entries()) {
 			for(const [j, exam] of course.exams.entries()) {
@@ -123,5 +124,15 @@ export class StudentExamsPage extends TitlePage {
 				link_td.appendChild(link_a);
 			}
 		}
+	}
+
+	_fillForm(frag: DocumentFragment, year: string) {
+		const input = <HTMLInputElement>frag.getElementById("year");
+		input.value = year;
+		const form = <HTMLFormElement>frag.getElementById("year_form");
+		form.addEventListener("submit", (e) => {
+			e.preventDefault();
+			this.app.navigateTo(input.value);
+		});
 	}
 }
