@@ -152,3 +152,30 @@ export class ProfessorExamsPage extends ExamsPage {
 		return this.app.model.getProfCoursesExams(id, year);
 	}
 }
+
+export class StudentExamRegistrationPage extends TitlePage {
+	show({id, examId}: {id: string, examId: string}) {
+		super.show();
+		Promise.all([
+			this.app.templateEngine.get("exam_tab"),
+			this.app.model.getStudExam(+id, +examId)
+		]).then(([frag, res]) => {
+			if(res.error) {
+				console.error(res.error);
+				this.app.redirectTo("..");
+				return;
+			}
+			const exam = res.data!;
+			this._fillExam(frag, exam);
+			this.app.view.content.replaceChildren(frag);
+		});
+	}
+
+	_fillExam(frag: DocumentFragment, exam: ExamCourse) {
+		frag.getElementById("course_id")!.innerText = exam.course.id as unknown as string;
+		frag.getElementById("course_name")!.innerText = exam.course.name;
+		frag.getElementById("exam_id")!.innerText = exam.id as unknown as string;
+		const date = new Date(exam.date);
+		frag.getElementById("exam_date")!.innerText = date.toLocaleDateString(navigator.language, {day: "numeric", month: "long", year: "numeric"});
+	}
+}
