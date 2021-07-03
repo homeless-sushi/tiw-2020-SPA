@@ -115,7 +115,8 @@ export abstract class ExamsPage extends TitlePage {
 				const id_td = tr.insertCell();
 				id_td.innerText = exam.id as unknown as string;
 				const date_td = tr.insertCell();
-				date_td.innerText = exam.date;
+				const date = new Date(exam.date);
+				date_td.innerText = date.toLocaleDateString(navigator.language, {day: "numeric", month: "long", year: "numeric"});
 				const link_td = tr.insertCell();
 				const link_a = document.createElement("a");
 				link_a.className = "symbol data-link";
