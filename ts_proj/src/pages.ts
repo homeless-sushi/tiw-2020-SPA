@@ -261,6 +261,18 @@ export class ProfEditExamPage extends TitlePage {
 				const laude = (document.getElementById("laude")! as HTMLInputElement).checked
 				const examEval : ExamEvaluation = [examRegistration.studentId, examResult, grade, laude];
 
+				const errorDiv = document.getElementById("edit_error")! as HTMLDivElement;
+				errorDiv.textContent = "";
+				const check = _inputCheck(examEval);
+				if(!check.correct){
+					for (const error of check.errors) {
+						const errorP = document.createElement("p");
+						errorP.innerText = error;
+						errorDiv.appendChild(errorP);
+					}
+					return;
+				}
+
 				const result = this.app.model.editProfExamRegistrations(+professorId, +examId, [examEval]);
 				result.then(({data, error}) => {
 					if(error != null || !data){
@@ -272,6 +284,41 @@ export class ProfEditExamPage extends TitlePage {
 			});
 		}
 	}
+}
+
+function _inputCheck(examEval : ExamEvaluation) : {correct: boolean, errors: string[]} {
+	let check : {correct: boolean, errors: string[]} = {correct: true, errors: []};
+
+	const examResult = examEval[1];
+	const grade : number = examEval[2];
+	const laude : boolean = examEval[3];
+
+	switch(examResult){
+		case "VUOTO":
+			if(grade != 0){
+				check.correct = false;
+				check.errors.push("Grade should be 0 with EMPTY exam");
+			}
+			break;
+		case "ASS":
+			if(grade != 0){
+				check.correct = false;
+				check.errors.push("Grade should be 0 on ABSENT student");
+			}
+			break;
+		case "PASS":
+		if(grade < 18){
+			check.correct = false;
+			check.errors.push("Grade should be greater than 18 on PASSED exam");
+		}
+	}
+
+	if(laude && grade!= 30){
+		check.correct = false;
+		check.errors.push("Laude cannot be given with a grade lower than 30");
+	}
+
+	return check;
 }
 
 function getStatusData(status: ExamStatus): {value: number, string: string} {
