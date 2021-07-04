@@ -185,3 +185,111 @@ export class StudentExamRegistrationPage extends TitlePage {
 		frag.getElementById("exam_date")!.innerText = date.toLocaleDateString(navigator.language, {day: "numeric", month: "long", year: "numeric"});
 	}
 }
+
+export class ProfEditExamPage extends TitlePage {
+	show({id, examId, studentId}: {id: string, examId: string, studentId: string}) {
+		super.show();
+
+		Promise.all([
+			Promise.all([
+				this.app.templateEngine.get("exam_tab"),
+				this.app.model.getProfExam(+id, +examId)
+			]).then(([frag, res]) => {
+				if(res.error) {
+					throw res.error;
+				}
+				const exam = res.data!;
+				this._fillExam(frag, exam);
+				return frag;
+			}),
+			Promise.all([
+				this.app.templateEngine.get("single_edit"),
+				this.app.model.getProfExamRegistration(+id, +examId, +studentId)
+			]).then(([frag, res]) => {
+				if(res.error) {
+					throw res.error;
+				}
+				const examReg = res.data!;
+				this._fill(frag, id, examId, examReg);
+				return frag;
+			})
+		]).then(([examTableFrag, singleEditFrag]) => {
+			this.app.view.content.replaceChildren(examTableFrag, singleEditFrag);
+			this.app.view.showBackLink("Exam Registrations", `..`);
+		}).catch((resError) => {
+			console.error(resError);
+			this.app.redirectTo(`..`);
+		});
+	}
+
+	_fillExam(frag: DocumentFragment, exam: ExamCourse) {
+		frag.getElementById("course_id")!.innerText = exam.course.id as unknown as string;
+		frag.getElementById("course_name")!.innerText = exam.course.name;
+		frag.getElementById("exam_id")!.innerText = exam.id as unknown as string;
+		const date = new Date(exam.date);
+		frag.getElementById("exam_date")!.innerText = date.toLocaleDateString(navigator.language, {day: "numeric", month: "long", year: "numeric"});
+	}
+
+	_fill(frag: DocumentFragment, professorId: string, examId: string, examRegistration: ExamRegistrationCareer) {
+		{
+			const career = examRegistration.career;
+			const user = examRegistration.career.user;
+			frag.getElementById("student_id")!.innerText = career.id as unknown as string;
+			frag.getElementById("person_code")!.innerText = user.personCode;
+			frag.getElementById("name")!.innerText = user.name;
+			frag.getElementById("surname")!.innerText = user.surname;
+		}
+		{
+			const select = frag.getElementById("examResult")! as HTMLSelectElement;
+			const allExamResults : ExamResult[] = ['VUOTO', 'ASS', 'RM', 'RP', 'PASS'];
+			for(const examResult of allExamResults){
+				const option : HTMLOptionElement = new Option(getResultData(examResult).string, examResult)
+				select.add(option);
+
+				if(examResult == examRegistration.result){
+					option.setAttribute("selected", "selected");
+				}
+			}
+			(frag.getElementById("grade")! as HTMLInputElement).value = examRegistration.grade as unknown as string;
+			(frag.getElementById("laude")! as HTMLInputElement).checked = examRegistration.laude;
+
+			const submitButton = (frag.getElementById("submit")! as HTMLInputElement);
+			submitButton.addEventListener("click", (e: MouseEvent) => {
+					e.preventDefault();
+				const examResult = (document.getElementById("examResult")! as HTMLSelectElement).value as ExamResult;
+				const grade = (document.getElementById("grade")! as HTMLInputElement).value as unknown as number;
+				const laude = (document.getElementById("laude")! as HTMLInputElement).checked
+				const examEval : ExamEvaluation = [examRegistration.studentId, examResult, grade, laude];
+
+				const result = this.app.model.editProfExamRegistrations(+professorId, +examId, [examEval]);
+				result.then(({data, error}) => {
+					if(error != null || !data){
+						this.app.redirectTo(`./${examRegistration.studentId}`);
+						return;
+					}
+					this.app.navigateTo(`..`);
+				})
+			});
+		}
+	}
+}
+
+function getStatusData(status: ExamStatus): {value: number, string: string} {
+	return {
+		NINS: {value: 0, string: "NOT INSERTED"},
+		INS: {value: 1, string: "INSERTED"},
+		PUB: {value: 2, string: "PUBLISHED"},
+		RIF: {value: 3, string: "REJECTED"},
+		VERB: {value: 4, string: "VERBALIZED"},
+	}[status];
+}
+
+function getResultData(result: ExamResult): {value: number, string: string} {
+	return {
+		VUOTO: {value: 0, string: "EMPTY"},
+		ASS: {value: 1, string: "ABSENT"},
+		RM: {value: 2, string: "POSTPONED"},
+		RP: {value: 3, string: "TO SIT AGAIN"},
+		PASS: {value: 4, string: "PASSED"},
+	}[result];
+}

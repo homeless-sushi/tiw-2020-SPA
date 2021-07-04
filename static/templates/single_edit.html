@@ -1,0 +1,44 @@
+<section>
+	<table id="student_info" class="list wide fixed">
+		<thead>
+			<tr>
+				<th scope="col">Student ID</th>
+				<th scope="col">Person Code</th>
+				<th scope="col">Name</th>
+				<th scope="col">Surname</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td id="student_id"></td>
+				<td id="person_code"></td>
+				<td id="name"></td>
+				<td id="surname"></td>
+			</tr>
+		</tbody>
+	</table>
+</section>
+<section>
+	<form class="boxed" method="POST">
+		<div class="field">
+			<label for="examResult">Exam Result</label>
+			<select class="expand" id="examResult" name="examResult" size="1" required>
+
+			</select>
+		</div>
+		<div class="field">
+			<label for="grade">Grade</label>
+			<input class="expand" type="number" min="0" max="30" id="grade" name="grade" th:value="${examRegistration.grade}" required>
+		</div>
+		<div class="field">
+			<label for="laude">Laude</label>
+			<div class="expand">
+				<input type="checkbox" id="laude" name="laude" value="true">
+			</div>
+		</div>
+		<div class="field">
+			<input id="submit" type="submit" value="Save">
+		</div>
+		<div id="edit_error" class="error"></div>
+	</form>
+</section>
