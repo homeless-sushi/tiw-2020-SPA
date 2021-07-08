@@ -1,3 +1,4 @@
+import { App } from "./core/App.js";
 import { RedirectPage, TitlePage } from "./core/Page.js";
 
 declare global {
@@ -14,6 +15,10 @@ export class DefaultPage extends TitlePage {
 }
 
 export class LoginPage extends TitlePage {
+	constructor(app: App) {
+		super(app, {title: "Login"});
+	}
+
 	show() {
 		super.show();
 		this.app.view.clearCareer();
@@ -51,6 +56,10 @@ export class LogoutPage extends RedirectPage {
 }
 
 export class CareersPage extends TitlePage {
+	constructor(app: App) {
+		super(app, {title: "Careers"});
+	}
+
 	show() {
 		super.show();
 		this.app.view.clearCareer();
@@ -85,6 +94,10 @@ export class CareersPage extends TitlePage {
 }
 
 export abstract class ExamsPage extends TitlePage {
+	constructor(app: App) {
+		super(app, {title: "Exams"});
+	}
+
 	show({id, year}: {id: string, year: string}) {
 		super.show();
 		this.app.view.clearBackLink();
@@ -159,6 +172,10 @@ export class ProfessorExamsPage extends ExamsPage {
 }
 
 export class StudentExamRegistrationPage extends TitlePage {
+	constructor(app: App) {
+		super(app, {title: "Exam Registration"});
+	}
+
 	show({id, examId}: {id: string, examId: string}) {
 		super.show();
 		Promise.all([
@@ -180,6 +197,10 @@ export class StudentExamRegistrationPage extends TitlePage {
 }
 
 export class ProfEditExamPage extends TitlePage {
+	constructor(app: App) {
+		super(app, {title: "Edit Exam Registration"});
+	}
+
 	show({id, examId, studentId}: {id: string, examId: string, studentId: string}) {
 		super.show();
 
@@ -312,6 +333,10 @@ type Column = {
 	ascending: boolean,
 }
 export class ProfExamRegistrationsPage extends TitlePage {
+	constructor(app: App) {
+		super(app, {title: "Exam Registration"});
+	}
+
 	_currColumn? : Column;
 	_columns : Column[] = [
 		{
