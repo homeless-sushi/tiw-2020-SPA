@@ -3,13 +3,14 @@ import { Template, StringTemplate, URLTemplate } from "./Template.js";
 export class TemplateEngine {
 	private _templates: Map<string, Template> = new Map();
 	pathPrefix: string = "";
+	pathSuffix: string = "";
 
 	addTemplate(name: string, template: Template): void {
 		this._templates.set(name, template);
 	}
 
-	addURLTemplate(name: string, url: string): void {
-		this.addTemplate(name, new URLTemplate(this.pathPrefix + url));
+	addURLTemplate(name: string): void {
+		this.addTemplate(name, new URLTemplate(this.pathPrefix + name + this.pathSuffix));
 	}
 
 	addStringTemplate(name: string, html: string): void {

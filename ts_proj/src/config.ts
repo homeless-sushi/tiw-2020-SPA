@@ -39,13 +39,14 @@ export const filters: [string, FilterCtor, {[k: string]: string}?][] = [
 	["/inside/professor/:id/*", CareerFilter, {role: "professor"}],
 ];
 
-export const templatesPath = "/static/templates/";
+export const templatesPrefix = "/static/templates/";
+export const templatesSuffix = ".html";
 
-export const templates: [string, string][] = [
-	["login", "login.html"],
-	["careers", "careers.html"],
-	["exams", "exams.html"],
-	["exam_tab", "exam_tab.html"],
-	["registrations", "registrations.html"],
-	["single_edit", "single_edit.html"],
+export const templates: string[] = [
+	"login",
+	"careers",
+	"exams",
+	"exam_tab",
+	"registrations",
+	"single_edit",
 ];

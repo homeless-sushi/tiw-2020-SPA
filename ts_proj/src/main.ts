@@ -18,9 +18,10 @@ function main() {
 		app.addFilterRoute(...filter);
 
 	const te = app.templateEngine;
-	te.pathPrefix = config.templatesPath;
+	te.pathPrefix = config.templatesPrefix;
+	te.pathSuffix = config.templatesSuffix;
 	for(const template of config.templates)
-		te.addURLTemplate(...template);
+		te.addURLTemplate(template);
 
 	app.run();
 }
