@@ -50,4 +50,7 @@ export const templates: string[] = [
 	"exam_tab",
 	"registrations",
 	"single_edit",
+	"exam_unregistered",
+	"exam_unpublished",
+	"exam_evaluation",
 ];

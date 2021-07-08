@@ -189,10 +189,73 @@ export class StudentExamRegistrationPage extends TitlePage {
 			_fillExam(frag, exam);
 			this.app.view.content.replaceChildren(frag);
 			this.app.view.showBackLink("Exams", `../../${exam.year}`);
+			return this._getStudExamReg(+id, +examId);
+		}).then(frag => {
+			this.app.view.content.append(frag);
 		}).catch(e => {
 			console.error(e);
 			this.app.redirectTo("..");
 		});
+	}
+
+	async _getStudExamReg(id: number, examId: number) {
+		const res = await this.app.model.getStudExamReg(id, examId);
+		if(res.error) {
+			throw res.error;
+		}
+		const reg = res.data!;
+
+		let frag;
+		if(reg == null) {
+			frag = await this.app.templateEngine.get("exam_unregistered");
+			frag.getElementById("register_form")!.addEventListener("submit", e => {
+				e.preventDefault();
+				this.app.model.registerStudToExamReg(id, examId)
+					.then(_res => {
+						if(_res.error != null)
+							throw _res.error;
+						if(!_res.data)
+							console.warn("Operation did not succeed");
+						this.app.redirectTo("");
+					});
+			});
+		}
+		else if(reg.result == "VUOTO") {
+			frag = await this.app.templateEngine.get("exam_unpublished");
+			frag.getElementById("deregister_form")!.addEventListener("submit", e => {
+				e.preventDefault();
+				this.app.model.deregisterStudFromExamReg(id, examId)
+					.then(_res => {
+						if(_res.error != null)
+							throw _res.error;
+						if(!_res.data)
+							console.warn("Operation did not succeed");
+						this.app.redirectTo("");
+					});
+			});
+		}
+		else {
+			frag = await this.app.templateEngine.get("exam_evaluation");
+			const reject_form = frag.getElementById("reject_form")!;
+			frag.getElementById("registration_status")!.innerText = getStatusString(reg.status);
+			frag.getElementById("registration_grade")!.innerText =  getGradeString(reg.resultRepresentation);
+			if(reg.status == "PUB" && reg.result == "PASS") {
+				reject_form.addEventListener("submit", e => {
+					e.preventDefault();
+					this.app.model.rejectStudExamReg(id, examId)
+						.then(_res => {
+							if(_res.error != null)
+								throw _res.error;
+							if(!_res.data)
+								console.warn("Operation did not succeed");
+							this.app.redirectTo("");
+						});
+				});
+			} else {
+				reject_form.remove();
+			}
+		}
+		return frag;
 	}
 }
 
@@ -566,4 +629,8 @@ function getResultData(result: ExamResult): {value: number, string: string} {
 
 function getGradeString(resultRepresentation: string): string {
 	return getResultData(resultRepresentation as unknown as ExamResult)?.string ?? resultRepresentation;
+}
+
+function getStatusString(status: ExamStatus): string {
+	return getStatusData(status).string;
 }
