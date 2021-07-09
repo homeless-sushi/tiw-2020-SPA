@@ -1,0 +1,28 @@
+<section>
+	<a class="data-link" href="">Show Records</a>
+</section>
+<section>
+	<table class="list">
+	<thead>
+		<tr id="registrations_headers_trow">
+		</tr>
+	</thead>
+	<tbody id="registrations_tbody">
+	</tbody>
+	</table>
+</section>
+<section>
+	<div class="row">
+		<form id="publish_form">
+			<div class="field">
+				<input id="publish_submit" type="submit" value="Publish">
+			</div>
+		</form>
+		<form id="submit_button">
+			<input type="hidden" name="examId" th:value="${exam.id}">
+			<div class="field">
+				<input id="verbalize_submit" type="submit" value="Verbalize">
+			</div>
+		</form>
+	</div>
+</section>

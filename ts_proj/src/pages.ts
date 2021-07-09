@@ -321,6 +321,211 @@ function _inputCheck(examEval : ExamEvaluation) : {correct: boolean, errors: str
 	return check;
 }
 
+type Column = {
+	name: string,
+	compare: (examReg1: ExamRegistrationCareer, examReg2: ExamRegistrationCareer) => number,
+	ascending: boolean,
+}
+export class ProfExamRegistrationsPage extends TitlePage {
+	_currColumn? : Column;
+	_columns : Column[] = [
+		{
+			name: "Student ID",
+			compare: (examReg1 : ExamRegistrationCareer, examReg2 : ExamRegistrationCareer) : number => {
+				return examReg1.studentId - examReg2.studentId;
+			},
+			ascending : false,
+		},
+		{
+			name: "Name",
+			compare: (examReg1 : ExamRegistrationCareer, examReg2 : ExamRegistrationCareer) : number => {
+				return (examReg1.career.user.name >= examReg2.career.user.name) ? 1 : -1;
+			},
+			ascending : false,
+		},
+		{
+			name: "Surname",
+			compare: (examReg1 : ExamRegistrationCareer, examReg2 : ExamRegistrationCareer) : number => {
+				return (examReg1.career.user.surname >= examReg2.career.user.surname) ? 1 : -1;
+			},
+			ascending : false,
+		},
+		{
+			name: "Email",
+			compare: (examReg1 : ExamRegistrationCareer, examReg2 : ExamRegistrationCareer) : number => {
+				return (examReg1.career.user.email >= examReg2.career.user.email) ? 1 : -1;
+			},
+			ascending : false,
+		},
+		{
+			name: "Major",
+			compare: (examReg1 : ExamRegistrationCareer, examReg2 : ExamRegistrationCareer) : number => {
+				return (examReg1.career.major! >= examReg2.career.major!) ? 1 : -1;
+			},
+			ascending : false,
+		},
+		{
+			name: "Status",
+			compare: (examReg1 : ExamRegistrationCareer, examReg2 : ExamRegistrationCareer) : number => {
+				return getStatusData(examReg1.status).value - getStatusData(examReg2.status).value;
+			},
+			ascending : false,
+		},
+		{
+			name: "Grade",
+			compare: (examReg1 : ExamRegistrationCareer, examReg2 : ExamRegistrationCareer) : number => {
+				const resultCompare = getResultData(examReg1.result).value - getResultData(examReg2.result).value;
+				if(resultCompare == 0){
+					const gradeCompare = examReg1.grade - examReg2.grade;
+					if(gradeCompare == 0){
+						return +examReg1.laude - +examReg2.laude;
+					}else{
+						return gradeCompare;
+					}
+				}else{
+					return resultCompare;
+				}
+			},
+			ascending : false,
+		}
+	];
+	_registrations : ExamRegistrationCareer[] = [];
+
+	show({id, examId}: {id: string, examId: string}) {
+		super.show();
+
+		Promise.all([
+			this.app.templateEngine.get("registrations"),
+			this.app.model.getProfExamRegistrations(+id, +examId)
+		]).then(([frag, res]) => {
+			if(res.error != null){
+				throw res.error;
+			}
+
+			this._registrations = res.data!
+			this._fill(frag, id, examId);
+			this.app.view.content.replaceChildren(frag);
+			this._sortTable();
+		}).catch((resError) => {
+			console.error(resError);
+			this.app.redirectTo(`..`);
+		});
+	}
+
+	_fill(frag: DocumentFragment, professorId: string, examId: string) {
+		{
+			const headersRow = frag.getElementById("registrations_headers_trow")! as HTMLTableRowElement;
+			for(const column of this._columns){
+				const header = this._createHeaderCell(column);
+				headersRow.append(header);
+			}
+			const editHeader = document.createElement("th");
+			editHeader.append(document.createTextNode("Edit exam result"));
+			editHeader.setAttribute("scope", "col");
+			headersRow.append(editHeader);
+		}
+		{
+			const publishSubmit = frag.getElementById("publish_submit")! as HTMLInputElement;
+			publishSubmit.addEventListener("click", (e: MouseEvent) => {
+				e.preventDefault();
+				this.app.model.publishProfExamRegistrations(+professorId, +examId)
+				.then(() => this.app.navigateTo(`.`));
+			});
+			const verbalizeSubmit = frag.getElementById("verbalize_submit")! as HTMLInputElement;
+			verbalizeSubmit.addEventListener("click", (e: MouseEvent) => {
+				e.preventDefault();
+				this.app.model.verbalizeProfExamRegistrations(+professorId, +examId)
+				.then(() => this.app.navigateTo(`.`));
+			});
+
+		}
+	}
+
+	_createHeaderCell(column: Column) : HTMLTableHeaderCellElement {
+		const headerCell = document.createElement("th");
+		headerCell.setAttribute("scope", "col");
+		headerCell.setAttribute("id", column.name);
+		headerCell.append(document.createTextNode(column.name));
+
+		headerCell.addEventListener("click", (e: MouseEvent) => {
+			if(this._currColumn != null){
+				document.getElementById(this._currColumn.name)?.replaceChildren(document.createTextNode(this._currColumn.name));
+			}
+
+			column.ascending = !column.ascending;
+			this._currColumn = column;
+			headerCell.replaceChildren(document.createTextNode(column.name + " " + (column.ascending ? '▲' : '▼')));
+			this._sortTable();
+		});
+
+		return headerCell;
+	}
+
+	_sortTable(){
+		if(this._currColumn != null){
+			this._registrations.sort(this._currColumn.compare);
+			if(!this._currColumn.ascending){
+				this._registrations.reverse();
+			}
+		}
+		const trows : HTMLTableRowElement[] = [];
+		for(const examRegistration of this._registrations){
+			const tcells : HTMLTableCellElement[] = [];
+
+			let tcell = document.createElement("td");
+			tcell.appendChild(document.createTextNode(examRegistration.career.id as unknown as string));
+			tcells.push(tcell);
+
+			tcell = document.createElement("td");
+			tcell.appendChild(document.createTextNode(examRegistration.career.user.name));
+			tcells.push(tcell);
+
+			tcell = document.createElement("td");
+			tcell.appendChild(document.createTextNode(examRegistration.career.user.surname));
+			tcells.push(tcell);
+
+			tcell = document.createElement("td");
+			tcell.appendChild(document.createTextNode(examRegistration.career.user.email));
+			tcells.push(tcell);
+
+			tcell = document.createElement("td");
+			tcell.appendChild(document.createTextNode(examRegistration.career.major!));
+			tcells.push(tcell);
+
+			tcell = document.createElement("td");
+			tcell.appendChild(document.createTextNode(getStatusData(examRegistration.status).string));
+			tcells.push(tcell);
+
+			tcell = document.createElement("td");
+			tcell.appendChild(document.createTextNode(getGradeString(examRegistration.resultRepresentation)));
+			tcells.push(tcell);
+
+			tcell = document.createElement("td");
+			switch(examRegistration.status){
+				case 'PUB':
+					tcell.appendChild(document.createTextNode("Exam result has been published"));
+					break;
+				case 'VERB':
+					tcell.appendChild(document.createTextNode("Exam result has been finalized"));
+					break;
+				default:
+					const a = document.createElement("a");
+					a.setAttribute("class", "symbol data-link");
+					a.setAttribute("href",`reg/${examRegistration.studentId}`);
+					a.appendChild(document.createTextNode("➡"));
+					tcell.appendChild(a);
+			}
+			tcells.push(tcell);
+
+			const trow = document.createElement("tr");
+			trow.append(...tcells);
+			trows.push(trow);
+		}
+		const registrationsTBody = document.getElementById("registrations_tbody")!;
+		registrationsTBody.replaceChildren(...trows);
+	}
+}
+
 function getStatusData(status: ExamStatus): {value: number, string: string} {
 	return {
 		NINS: {value: 0, string: "NOT INSERTED"},
@@ -339,4 +544,8 @@ function getResultData(result: ExamResult): {value: number, string: string} {
 		RP: {value: 3, string: "TO SIT AGAIN"},
 		PASS: {value: 4, string: "PASSED"},
 	}[result];
+}
+
+function getGradeString(resultRepresentation: string): string {
+	return getResultData(resultRepresentation as unknown as ExamResult)?.string ?? resultRepresentation;
 }
