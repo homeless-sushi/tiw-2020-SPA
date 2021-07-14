@@ -2,7 +2,7 @@ import { FilterCtor } from "./core/Filter.js";
 import { PageCtor, RedirectPage } from "./core/Page.js";
 import { getAcademicYear } from "./core/utils.js";
 import { CareerFilter, InsideFilter } from "./filters.js";
-import { CareersPage, DefaultPage, StudentExamRegistrationPage, LoginPage, LogoutPage, ProfessorExamsPage, StudentExamsPage, ProfExamRegistrationsPage, ProfEditExamPage } from "./pages.js";
+import { CareersPage, DefaultPage, StudentExamRegistrationPage, LoginPage, LogoutPage, ProfessorExamsPage, StudentExamsPage, ProfExamRegistrationsPage, ProfEditExamPage, RecordsPage } from "./pages.js";
 
 export const defaultPage: [PageCtor, any?] = [DefaultPage, {title: "Not Found"}];
 
@@ -32,6 +32,7 @@ export const pages: [string, PageCtor, any?][] = [
 	["/inside/professor/:id/exams/exam/:examId", RedirectPage, {location: ({examId}: {examId: string}) => `${examId}/`}],
 	["/inside/professor/:id/exams/exam/:examId/", ProfExamRegistrationsPage],
 	["/inside/professor/:id/exams/exam/:examId/reg/:studentId", ProfEditExamPage],
+	["/inside/professor/:id/exams/exam/:examId/records", RecordsPage],
 ];
 
 export const filters: [string, FilterCtor, {[k: string]: string}?][] = [
@@ -53,4 +54,5 @@ export const templates: string[] = [
 	"exam_unregistered",
 	"exam_unpublished",
 	"exam_evaluation",
+	"records",
 ];

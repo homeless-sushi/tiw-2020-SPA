@@ -508,7 +508,7 @@ export class ProfExamRegistrationsPage extends TitlePage {
 			verbalizeSubmit.addEventListener("click", (e: MouseEvent) => {
 				e.preventDefault();
 				this.app.model.verbalizeProfExamRegistrations(+professorId, +examId)
-				.then(() => this.app.navigateTo(`.`));
+				.then(() => this.app.navigateTo("records"));
 			});
 
 		}
@@ -596,6 +596,58 @@ export class ProfExamRegistrationsPage extends TitlePage {
 		}
 		const registrationsTBody = document.getElementById("registrations_tbody")!;
 		registrationsTBody.replaceChildren(...trows);
+	}
+}
+
+export class RecordsPage extends TitlePage {
+	constructor(app: App) {
+		super(app, {title: "Records"});
+	}
+
+	show({id, examId}: {id: string, examId: string}) {
+		super.show();
+		this.app.view.showBackLink("Exam Registrations", ".");
+		Promise.all([
+			this.app.templateEngine.get("records"),
+			this.app.model.getProfExamRecords(+id, +examId)
+		]).then(([frag, res]) => {
+			if(res.error) {
+				throw res.error;
+			}
+			this._fillTable(frag, res.data!);
+			this.app.view.content.replaceChildren(frag);
+		}).catch(e => {
+			console.error(e);
+			this.app.redirectTo(".");
+		});
+	}
+
+	_fillTable(frag: DocumentFragment, records: ExamRecord[]) {
+		const tbody = <HTMLTableElement>frag.getElementById("records_tbody");
+		for(const [i, record] of records.entries()) {
+			for(const [j, reg] of record.examRegistrations.entries()) {
+				const tr = tbody.insertRow();
+				if(!j) {
+					const recordId_th = document.createElement("th");
+					const recordTime_th = document.createElement("th");
+					tr.append(recordId_th, recordTime_th);
+					recordId_th.innerText = record.id as unknown as string;
+					recordTime_th.innerText = record.time;
+					const time = new Date(record.time);
+					recordTime_th.innerText = time.toLocaleString(navigator.language, {day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"});
+					recordId_th.className = recordTime_th.className = i % 2 ? "odd" : "even";
+					recordId_th.rowSpan = recordTime_th.rowSpan = record.examRegistrations.length;
+				}
+				const id_td = tr.insertCell();
+				id_td.innerText = reg.studentId as unknown as string;
+				const name_td = tr.insertCell();
+				name_td.innerText = reg.career.user.name;
+				const surname_td = tr.insertCell();
+				surname_td.innerText = reg.career.user.surname;
+				const grade_td = tr.insertCell();
+				grade_td.innerText = getGradeString(reg.resultRepresentation);
+			}
+		}
 	}
 }
 
