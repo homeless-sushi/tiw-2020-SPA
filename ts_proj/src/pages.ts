@@ -93,13 +93,14 @@ export abstract class ExamsPage extends TitlePage {
 			this._getExams(+id, +year)
 		]).then(([frag, res]) => {
 			if(res.error) {
-				console.error(res.error);
-				this.app.redirectTo("/inside/careers");
-				return;
+				throw res.error;
 			}
 			this._fillTable(frag, res.data!);
 			this._fillForm(frag, year);
 			this.app.view.content.replaceChildren(frag);
+		}).catch(e => {
+			console.error(e);
+			this.app.redirectTo("/inside/careers");
 		});
 	}
 
@@ -151,7 +152,6 @@ export class StudentExamsPage extends ExamsPage {
 	}
 }
 
-
 export class ProfessorExamsPage extends ExamsPage {
 	async _getExams(id: number, year: number): Promise<APIResponse<CourseExams[]>> {
 		return this.app.model.getProfCoursesExams(id, year);
@@ -166,14 +166,15 @@ export class StudentExamRegistrationPage extends TitlePage {
 			this.app.model.getStudExam(+id, +examId)
 		]).then(([frag, res]) => {
 			if(res.error) {
-				console.error(res.error);
-				this.app.redirectTo("..");
-				return;
+				throw res.error;
 			}
 			const exam = res.data!;
 			this._fillExam(frag, exam);
 			this.app.view.content.replaceChildren(frag);
 			this.app.view.showBackLink("Exams", `../${exam.year}`);
+		}).catch(e => {
+			console.error(e);
+			this.app.redirectTo("..");
 		});
 	}
 
