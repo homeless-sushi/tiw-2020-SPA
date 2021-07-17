@@ -468,17 +468,32 @@ export class ProfExamRegistrationsPage extends TitlePage {
 		super.show();
 
 		Promise.all([
-			this.app.templateEngine.get("registrations"),
-			this.app.model.getProfExamRegistrations(+id, +examId)
-		]).then(([frag, res]) => {
-			if(res.error != null){
-				throw res.error;
-			}
-
-			this._registrations = res.data!
-			this._fill(frag, id, examId);
-			this.app.view.content.replaceChildren(frag);
-			this._sortTable();
+			Promise.all([
+				this.app.templateEngine.get("exam_tab"),
+				this.app.model.getProfExam(+id, +examId)
+			]).then(([frag, res]) => {
+				if(res.error) {
+					throw res.error;
+				}
+				const exam = res.data!;
+				_fillExam(frag, exam);
+				this.app.view.showBackLink("Exams", `../../${exam.year}`);
+				return frag;
+			}),
+			Promise.all([
+				this.app.templateEngine.get("registrations"),
+				this.app.model.getProfExamRegistrations(+id, +examId)
+			]).then(([frag, res]) => {
+				if(res.error != null){
+					throw res.error;
+				}
+				this._registrations = res.data!
+				this._fill(frag, id, examId);
+				return frag;
+			})
+		]).then(([examtab, regs]) => {
+				this.app.view.content.replaceChildren(examtab, regs);
+				this._sortTable();
 		}).catch((resError) => {
 			console.error(resError);
 			this.app.redirectTo(`..`);
@@ -608,14 +623,32 @@ export class RecordsPage extends TitlePage {
 		super.show();
 		this.app.view.showBackLink("Exam Registrations", ".");
 		Promise.all([
-			this.app.templateEngine.get("records"),
-			this.app.model.getProfExamRecords(+id, +examId)
-		]).then(([frag, res]) => {
-			if(res.error) {
-				throw res.error;
-			}
-			this._fillTable(frag, res.data!);
-			this.app.view.content.replaceChildren(frag);
+			Promise.all([
+				this.app.templateEngine.get("exam_tab"),
+				this.app.model.getProfExam(+id, +examId)
+			]).then(([frag, res]) => {
+				if(res.error) {
+					throw res.error;
+				}
+				const exam = res.data!;
+				_fillExam(frag, exam);
+				return frag;
+			}),
+			Promise.all([
+				this.app.templateEngine.get("records"),
+				this.app.model.getProfExamRecords(+id, +examId)
+			]).then(([frag, res]) => {
+				if(res.error) {
+					throw res.error;
+				}
+				this._fillTable(frag, res.data!);
+				return frag;
+			})
+		]).then(([examtab, records]) => {
+				this.app.view.content.replaceChildren(examtab, records);
+		}).catch((resError) => {
+			console.error(resError);
+			this.app.redirectTo(`..`);
 		}).catch(e => {
 			console.error(e);
 			this.app.redirectTo(".");
