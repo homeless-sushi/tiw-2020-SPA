@@ -169,21 +169,13 @@ export class StudentExamRegistrationPage extends TitlePage {
 				throw res.error;
 			}
 			const exam = res.data!;
-			this._fillExam(frag, exam);
+			_fillExam(frag, exam);
 			this.app.view.content.replaceChildren(frag);
 			this.app.view.showBackLink("Exams", `../${exam.year}`);
 		}).catch(e => {
 			console.error(e);
 			this.app.redirectTo("..");
 		});
-	}
-
-	_fillExam(frag: DocumentFragment, exam: ExamCourse) {
-		frag.getElementById("course_id")!.innerText = exam.course.id as unknown as string;
-		frag.getElementById("course_name")!.innerText = exam.course.name;
-		frag.getElementById("exam_id")!.innerText = exam.id as unknown as string;
-		const date = new Date(exam.date);
-		frag.getElementById("exam_date")!.innerText = date.toLocaleDateString(navigator.language, {day: "numeric", month: "long", year: "numeric"});
 	}
 }
 
@@ -200,7 +192,7 @@ export class ProfEditExamPage extends TitlePage {
 					throw res.error;
 				}
 				const exam = res.data!;
-				this._fillExam(frag, exam);
+				_fillExam(frag, exam);
 				return frag;
 			}),
 			Promise.all([
@@ -221,14 +213,6 @@ export class ProfEditExamPage extends TitlePage {
 			console.error(resError);
 			this.app.redirectTo(`..`);
 		});
-	}
-
-	_fillExam(frag: DocumentFragment, exam: ExamCourse) {
-		frag.getElementById("course_id")!.innerText = exam.course.id as unknown as string;
-		frag.getElementById("course_name")!.innerText = exam.course.name;
-		frag.getElementById("exam_id")!.innerText = exam.id as unknown as string;
-		const date = new Date(exam.date);
-		frag.getElementById("exam_date")!.innerText = date.toLocaleDateString(navigator.language, {day: "numeric", month: "long", year: "numeric"});
 	}
 
 	_fill(frag: DocumentFragment, professorId: string, examId: string, examRegistration: ExamRegistrationCareer) {
@@ -525,6 +509,14 @@ export class ProfExamRegistrationsPage extends TitlePage {
 		const registrationsTBody = document.getElementById("registrations_tbody")!;
 		registrationsTBody.replaceChildren(...trows);
 	}
+}
+
+function _fillExam(frag: DocumentFragment, exam: ExamCourse) {
+	frag.getElementById("course_id")!.innerText = exam.course.id as unknown as string;
+	frag.getElementById("course_name")!.innerText = exam.course.name;
+	frag.getElementById("exam_id")!.innerText = exam.id as unknown as string;
+	const date = new Date(exam.date);
+	frag.getElementById("exam_date")!.innerText = date.toLocaleDateString(navigator.language, {day: "numeric", month: "long", year: "numeric"});
 }
 
 function getStatusData(status: ExamStatus): {value: number, string: string} {
