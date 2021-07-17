@@ -188,7 +188,7 @@ export class StudentExamRegistrationPage extends TitlePage {
 			const exam = res.data!;
 			_fillExam(frag, exam);
 			this.app.view.content.replaceChildren(frag);
-			this.app.view.showBackLink("Exams", `../${exam.year}`);
+			this.app.view.showBackLink("Exams", `../../${exam.year}`);
 		}).catch(e => {
 			console.error(e);
 			this.app.redirectTo("..");
