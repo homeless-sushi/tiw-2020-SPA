@@ -532,6 +532,58 @@ export class ProfExamRegistrationsPage extends TitlePage {
 				this.app.model.verbalizeProfExamRegistrations(+professorId, +examId)
 				.then(() => this.app.navigateTo("records"));
 			});
+			const multiInsert = frag.getElementById("multiinsert_submit")! as HTMLInputElement;
+			const multiInsertForm = frag.getElementById("multiinsert_form")! as HTMLFormElement;
+			multiInsert.addEventListener("click", (e: MouseEvent) => {
+				const formData = new FormData(multiInsertForm);
+				multiInsertForm.querySelectorAll("input[type=checkbox]").forEach((el) => formData.append("laude", (el as HTMLInputElement).checked ? "true" : ""));
+
+				const dataValues = {
+					studId: formData.getAll("studId"),
+					examResult: formData.getAll("examResult"),
+					grade: formData.getAll("grade"),
+					laude: formData.getAll("laude"),
+				}
+
+				const examEvals: ExamEvaluation[] = dataValues.studId.map((studId, i) => [
+					+studId.valueOf(),
+					dataValues.examResult[i].valueOf() as ExamResult,
+					+dataValues.grade[i].valueOf(),
+					!!dataValues.laude[i].valueOf()
+				]);
+
+				const errorDiv = document.getElementById("edit_error")! as HTMLDivElement;
+				errorDiv.innerText = "";
+				let errorF = false;
+				for(const examEval of examEvals) {
+					const check = _inputCheck(examEval);
+					if(!check.correct){
+						errorF = true;
+						const errorP = document.createElement("p");
+						errorDiv.appendChild(errorP);
+						errorP.innerText = `Student ${examEval[0]}:`;
+						for (const error of check.errors) {
+							errorP.innerText += `\n  ${error}`;
+						}
+					}
+				}
+				if(errorF) {
+					e.preventDefault();
+					return;
+				}
+
+				const result = this.app.model.editProfExamRegistrations(+professorId, +examId, examEvals);
+				result.then(({data, error}) => {
+					if(error != null) {
+						const errorP = document.createElement("p");
+						errorP.innerText = error.message;
+						errorDiv.appendChild(errorP);
+						e.preventDefault();
+						return;
+					}
+					this.app.redirectTo("");
+				})
+			});
 		}
 	}
 
@@ -596,6 +648,53 @@ export class ProfExamRegistrationsPage extends TitlePage {
 					a.href = `reg/${examRegistration.studentId}`;
 					a.innerText = "➡";
 					tcell_link.appendChild(a);
+			}
+			if(examRegistration.status == "NINS") {
+				const mrow = this._multiinsertTBody.insertRow();
+				for(const text of [
+					examRegistration.career.id,
+					examRegistration.career.user.name,
+					examRegistration.career.user.surname,
+				] as string[]) {
+					const tcell = mrow.insertCell();
+					tcell.innerText = text;
+				}
+
+				const studId_input = document.createElement("input");
+				const result_cell = mrow.insertCell();
+				const result_input = document.createElement("select");
+				result_cell.append(studId_input, result_input);
+				const grade_cell = mrow.insertCell();
+				const grade_input = document.createElement("input");
+				grade_cell.append(grade_input);
+				const laude_cell = mrow.insertCell();
+				const laude_input = document.createElement("input");
+				laude_cell.append(laude_input);
+
+				for(const examResult of ['VUOTO', 'ASS', 'RM', 'RP', 'PASS'] as ExamResult[]){
+					const option : HTMLOptionElement = new Option(getResultData(examResult).string, examResult)
+					result_input.add(option);
+					if(examResult == examRegistration.result)
+						option.selected = true;
+				}
+
+				studId_input.type = "hidden";
+				studId_input.name = "studId";
+				studId_input.value = examRegistration.career.id as unknown as string;
+
+				result_input.name = "examResult";
+				result_input.size = 1;
+				
+				grade_input.type = "number";
+				grade_input.min = "0";
+				grade_input.max = "30";
+				grade_input.name = "grade";
+				grade_input.value = examRegistration.grade as unknown as string;
+				
+				laude_input.type = "checkbox";
+				//laude_input.name = "laude";
+				laude_input.value = "true";
+				laude_input.checked = examRegistration.laude;
 			}
 		}
 	}

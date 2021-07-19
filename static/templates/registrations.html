@@ -41,20 +41,23 @@
 				<label class="btn-close" for="modal-1" aria-hidden="true">×</label>
 			</div>
 			<div class="modal-body">
-				<table class="list">
-					<thead>
-						<tr>
-							<th scope="col">Student ID</th>
-							<th scope="col">Name</th>
-							<th scope="col">Surname</th>
-							<th scope="col">Result</th>
-							<th scope="col">Grade</th>
-							<th scope="col">Laude</th>
-						</tr>
-					</thead>
-					<tbody id="multiinsert_tbody">
-					</tbody>
-				</table>
+				<form id="multiinsert_form">
+					<table class="list">
+						<thead>
+							<tr>
+								<th scope="col">Student ID</th>
+								<th scope="col">Name</th>
+								<th scope="col">Surname</th>
+								<th scope="col">Result</th>
+								<th scope="col">Grade</th>
+								<th scope="col">Laude</th>
+							</tr>
+						</thead>
+						<tbody id="multiinsert_tbody">
+						</tbody>
+					</table>
+				</form>
+				<div id="edit_error" class="error"></div>
 			</div>
 			<div class="modal-footer">
 				<label id="multiinsert_submit" class="btn btn-primary" for="modal-1">Submit</label>
