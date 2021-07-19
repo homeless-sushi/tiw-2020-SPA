@@ -42,8 +42,11 @@ export class LoginPage extends TitlePage {
 			.then(({data, error}) => {
 				if(error == null)
 					this.app.navigateTo("/inside/careers");
-				else
+				else {
+					document.getElementById("login_error")!
+						.replaceChildren(document.createTextNode(error.cause!.message));
 					console.error(error);
+				}
 			})
 	}
 }
