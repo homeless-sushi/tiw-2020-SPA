@@ -108,8 +108,9 @@
 	border-radius: 3px;
 	cursor: pointer;
 	display: inline-block;
-	font-size: 14px;
-	padding: 8px 15px;
+	/*font-size: 14px;*/
+	padding: .4em .8em;
+	margin: 18px 0;
 	text-decoration: none;
 	text-align: center;
 	min-width: 60px;

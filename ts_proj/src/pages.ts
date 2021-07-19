@@ -466,6 +466,8 @@ export class ProfExamRegistrationsPage extends TitlePage {
 		}
 	];
 	_registrations : ExamRegistrationCareer[] = [];
+	_registrationsTBody!: HTMLTableElement;
+	_multiinsertTBody!: HTMLTableElement;
 
 	show({id, examId}: {id: string, examId: string}) {
 		super.show();
@@ -490,7 +492,9 @@ export class ProfExamRegistrationsPage extends TitlePage {
 				if(res.error != null){
 					throw res.error;
 				}
-				this._registrations = res.data!
+				this._registrations = res.data!;
+				this._registrationsTBody = frag.getElementById("registrations_tbody") as HTMLTableElement;
+				this._multiinsertTBody = frag.getElementById("multiinsert_tbody") as HTMLTableElement;
 				this._fill(frag, id, examId);
 				return frag;
 			})
@@ -528,7 +532,6 @@ export class ProfExamRegistrationsPage extends TitlePage {
 				this.app.model.verbalizeProfExamRegistrations(+professorId, +examId)
 				.then(() => this.app.navigateTo("records"));
 			});
-
 		}
 	}
 
@@ -536,16 +539,18 @@ export class ProfExamRegistrationsPage extends TitlePage {
 		const headerCell = document.createElement("th");
 		headerCell.setAttribute("scope", "col");
 		headerCell.setAttribute("id", column.name);
-		headerCell.append(document.createTextNode(column.name));
+		headerCell.style.userSelect = "none";
+		headerCell.style.cursor = "pointer";
+		headerCell.innerText = column.name;
 
 		headerCell.addEventListener("click", (e: MouseEvent) => {
 			if(this._currColumn != null){
-				document.getElementById(this._currColumn.name)?.replaceChildren(document.createTextNode(this._currColumn.name));
+				document.getElementById(this._currColumn.name)!.innerText = this._currColumn.name;
 			}
 
 			column.ascending = !column.ascending;
 			this._currColumn = column;
-			headerCell.replaceChildren(document.createTextNode(column.name + " " + (column.ascending ? '▲' : '▼')));
+			headerCell.innerText = `${column.name} ${column.ascending ? '▲' : '▼'}`;
 			this._sortTable();
 		});
 
@@ -559,61 +564,40 @@ export class ProfExamRegistrationsPage extends TitlePage {
 				this._registrations.reverse();
 			}
 		}
-		const trows : HTMLTableRowElement[] = [];
+		this._registrationsTBody.replaceChildren();
+		this._multiinsertTBody.replaceChildren();
 		for(const examRegistration of this._registrations){
-			const tcells : HTMLTableCellElement[] = [];
+			const trow = this._registrationsTBody.insertRow();
 
-			let tcell = document.createElement("td");
-			tcell.appendChild(document.createTextNode(examRegistration.career.id as unknown as string));
-			tcells.push(tcell);
+			for(const text of [
+				examRegistration.career.id,
+				examRegistration.career.user.name,
+				examRegistration.career.user.surname,
+				examRegistration.career.user.email,
+				examRegistration.career.major,
+				getStatusData(examRegistration.status).string,
+				examRegistration.resultRepresentation,
+			] as string[]) {
+				const tcell = trow.insertCell();
+				tcell.innerText = text;
+			}
 
-			tcell = document.createElement("td");
-			tcell.appendChild(document.createTextNode(examRegistration.career.user.name));
-			tcells.push(tcell);
-
-			tcell = document.createElement("td");
-			tcell.appendChild(document.createTextNode(examRegistration.career.user.surname));
-			tcells.push(tcell);
-
-			tcell = document.createElement("td");
-			tcell.appendChild(document.createTextNode(examRegistration.career.user.email));
-			tcells.push(tcell);
-
-			tcell = document.createElement("td");
-			tcell.appendChild(document.createTextNode(examRegistration.career.major!));
-			tcells.push(tcell);
-
-			tcell = document.createElement("td");
-			tcell.appendChild(document.createTextNode(getStatusData(examRegistration.status).string));
-			tcells.push(tcell);
-
-			tcell = document.createElement("td");
-			tcell.appendChild(document.createTextNode(getGradeString(examRegistration.resultRepresentation)));
-			tcells.push(tcell);
-
-			tcell = document.createElement("td");
+			const tcell_link = trow.insertCell();
 			switch(examRegistration.status){
 				case 'PUB':
-					tcell.appendChild(document.createTextNode("Exam result has been published"));
+					tcell_link.innerText = "Exam result has been published";
 					break;
 				case 'VERB':
-					tcell.appendChild(document.createTextNode("Exam result has been finalized"));
+					tcell_link.innerText = "Exam result has been finalized";
 					break;
 				default:
 					const a = document.createElement("a");
-					a.setAttribute("class", "symbol data-link");
-					a.setAttribute("href",`reg/${examRegistration.studentId}`);
-					a.appendChild(document.createTextNode("➡"));
-					tcell.appendChild(a);
+					a.className = "symbol data-link";
+					a.href = `reg/${examRegistration.studentId}`;
+					a.innerText = "➡";
+					tcell_link.appendChild(a);
 			}
-			tcells.push(tcell);
-
-			const trow = document.createElement("tr");
-			trow.append(...tcells);
-			trows.push(trow);
 		}
-		const registrationsTBody = document.getElementById("registrations_tbody")!;
-		registrationsTBody.replaceChildren(...trows);
 	}
 }
 
